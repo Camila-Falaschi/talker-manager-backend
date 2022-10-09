@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const fs = require('fs').promises;
 const path = require('path');
 
+const newToken = require('./middleware/generateToken.js');
+
 const app = express();
 app.use(bodyParser.json());
 
@@ -13,6 +15,7 @@ const HTTP_OK_STATUS = 200;
 const PORT = '3000';
 
 const pathTalkers = path.resolve(__dirname, '..', 'src', 'talker.json');
+const pathLogin = path.resolve(__dirname, '..', 'src', 'login.json');
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -34,6 +37,15 @@ app.get('/talker/:id', async (req, res) => {
   }
 
   return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+});
+
+app.post('/login', async (req, res) => {
+  const loginReq = { ...req.body };
+  const loginList = JSON.parse(await fs.readFile(pathLogin, 'utf8'));
+  const newLoginList = [...loginList, loginReq];
+  await fs.writeFile(pathLogin, JSON.stringify(newLoginList));
+  const token = newToken();
+  res.status(200).json({ token });
 });
 
 app.listen(PORT, () => {
