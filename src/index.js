@@ -5,6 +5,7 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const newToken = require('./middleware/generateToken.js');
+const { validateEmail, validatePassword } = require('./middleware/validations.js');
 
 const app = express();
 app.use(bodyParser.json());
@@ -39,7 +40,7 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
 });
 
-app.post('/login', async (req, res) => {
+app.post('/login', validateEmail, validatePassword, async (req, res) => {
   const loginReq = { ...req.body };
   const loginList = JSON.parse(await fs.readFile(pathLogin, 'utf8'));
   const newLoginList = [...loginList, loginReq];

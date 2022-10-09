@@ -12,3 +12,9 @@ const verifyToken = () => {
 };
 
 module.exports = verifyToken;
+
+// para 'generateToken' e 'verifyToken' foi consultado:
+// o site DEV (),
+// as documentações no MDN (), () e (),
+// e os sites StackOverflow ()
+// e Wikipedia ()
