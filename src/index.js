@@ -5,7 +5,10 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const newToken = require('./middleware/generateToken.js');
-const { validateEmail, validatePassword } = require('./middleware/validations.js');
+const { validateEmail, validatePassword } = require('./middleware/loginValidations.js');
+const authentication = require('./middleware/authentication.js');
+const { validateName, validateAge, validateTalk, validateWatchedAt,
+  validateRate } = require('./middleware/talkerValidations.js');
 
 const app = express();
 app.use(bodyParser.json());
@@ -40,12 +43,22 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
 });
 
+app.post('/talker', authentication, validateName, validateAge, validateTalk,
+validateWatchedAt, validateRate, async (req, res) => {
+  const newTalker = { ...req.body };
+  const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
+  const newTalkerList = [...talkerList, newTalker];
+  await fs.writeFile(pathTalkers, JSON.stringify(newTalkerList));
+  res.status(201).json(newTalker);
+});
+
 app.post('/login', validateEmail, validatePassword, async (req, res) => {
   const loginReq = { ...req.body };
   const loginList = JSON.parse(await fs.readFile(pathLogin, 'utf8'));
-  const newLoginList = [...loginList, loginReq];
-  await fs.writeFile(pathLogin, JSON.stringify(newLoginList));
   const token = newToken();
+  const newLogin = { ...loginReq, token };
+  const newLoginList = [...loginList, newLogin];
+  await fs.writeFile(pathLogin, JSON.stringify(newLoginList));
   res.status(200).json({ token });
 });
 
