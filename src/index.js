@@ -57,8 +57,7 @@ app.post('/login', validateEmail, validatePassword, errorHandler, async (req, re
   const loginReq = { ...req.body };
   const loginList = JSON.parse(await fs.readFile(pathLogin, 'utf8'));
   const token = newToken();
-  const newLogin = { ...loginReq, token };
-  const newLoginList = [...loginList, newLogin];
+  const newLoginList = [...loginList, loginReq];
   await fs.writeFile(pathLogin, JSON.stringify(newLoginList));
   res.status(200).json({ token });
 });
