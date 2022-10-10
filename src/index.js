@@ -56,7 +56,7 @@ app.put('/talker/:id', authentication, validateName, validateAge, validateTalk,
 validateWatchedAt, validateRate, async (req, res) => {
   const { id } = req.params;
   const talkerToUpdate = { ...req.body };
-  const currentTalker = { ...talkerToUpdate, id };
+  const currentTalker = { ...talkerToUpdate, id: Number(id) };
   const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
   const otherTalkers = talkerList.filter((element) => element.id !== id);
   const newList = [...otherTalkers, currentTalker];
