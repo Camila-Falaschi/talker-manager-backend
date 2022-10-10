@@ -9,7 +9,7 @@ const { validateEmail, validatePassword } = require('./middleware/loginValidatio
 const authentication = require('./middleware/authentication.js');
 const { validateName, validateAge, validateTalk, validateWatchedAt,
   validateRate } = require('./middleware/talkerValidations.js');
-const errorHandler = require('./middleware/errorHandler.js');
+// const errorHandler = require('./middleware/errorHandler.js');
 
 const app = express();
 app.use(bodyParser.json());
@@ -45,7 +45,7 @@ app.get('/talker/:id', async (req, res) => {
 });
 
 app.post('/talker', authentication, validateName, validateAge, validateTalk,
-validateWatchedAt, validateRate, errorHandler, async (req, res) => {
+validateWatchedAt, validateRate, async (req, res) => {
   const newTalker = { ...req.body };
   const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
   const newTalkerList = [...talkerList, newTalker];
@@ -53,7 +53,7 @@ validateWatchedAt, validateRate, errorHandler, async (req, res) => {
   res.status(201).json(newTalker);
 });
 
-app.post('/login', validateEmail, validatePassword, errorHandler, async (req, res) => {
+app.post('/login', validateEmail, validatePassword, async (req, res) => {
   const loginReq = { ...req.body };
   const loginList = JSON.parse(await fs.readFile(pathLogin, 'utf8'));
   const token = newToken();
