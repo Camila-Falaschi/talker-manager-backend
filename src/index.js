@@ -49,8 +49,19 @@ validateWatchedAt, validateRate, async (req, res) => {
   const currentTalker = { ...newTalker, id: talkerList.length + 1 };
   const newTalkerList = [...talkerList, currentTalker];
   await fs.writeFile(pathTalkers, JSON.stringify(newTalkerList));
-  console.log(newTalker);
   res.status(201).json(currentTalker);
+});
+
+app.put('/talker/:id', authentication, validateName, validateAge, validateTalk,
+validateWatchedAt, validateRate, async (req, res) => {
+  const { id } = req.params;
+  const talkerToUpdate = { ...req.body };
+  const currentTalker = { ...talkerToUpdate, id };
+  const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
+  const otherTalkers = talkerList.filter((element) => element.id !== id);
+  const newList = [...otherTalkers, currentTalker];
+  await fs.writeFile(pathTalkers, JSON.stringify(newList));
+  res.status(200).json([currentTalker]);
 });
 
 app.post('/login', validateEmail, validatePassword, async (req, res) => {
