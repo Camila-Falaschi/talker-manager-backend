@@ -25,6 +25,11 @@ app.get('/', (_request, response) => {
   response.status(HTTP_OK_STATUS).send();
 });
 
+app.post('/login', validateEmail, validatePassword, async (req, res) => {
+  const token = newToken();
+  res.status(200).json({ token });
+});
+
 app.get('/talker', async (req, res) => {
   const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
   res.status(200).json(talkerList);
@@ -46,7 +51,8 @@ app.post('/talker', authentication, validateName, validateAge, validateTalk,
 validateWatchedAt, validateRate, async (req, res) => {
   const newTalker = { ...req.body };
   const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
-  const currentTalker = { ...newTalker, id: talkerList.length + 1 };
+  const newId = talkerList[talkerList.length - 1].id + 1;
+  const currentTalker = { ...newTalker, id: newId };
   const newTalkerList = [...talkerList, currentTalker];
   await fs.writeFile(pathTalkers, JSON.stringify(newTalkerList));
   res.status(201).json(currentTalker);
@@ -58,15 +64,18 @@ validateWatchedAt, validateRate, async (req, res) => {
   const talkerToUpdate = { ...req.body };
   const currentTalker = { ...talkerToUpdate, id: Number(id) };
   const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
-  const otherTalkers = talkerList.filter((element) => element.id !== id);
+  const otherTalkers = talkerList.filter((element) => element.id !== Number(id));
   const newList = [...otherTalkers, currentTalker];
   await fs.writeFile(pathTalkers, JSON.stringify(newList));
   res.status(200).json(currentTalker);
 });
 
-app.post('/login', validateEmail, validatePassword, async (req, res) => {
-  const token = newToken();
-  res.status(200).json({ token });
+app.delete('/talker/:id', authentication, async (req, res) => {
+  const { id } = req.params;
+  const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
+  const newList = talkerList.filter((item) => item.id !== Number(id));
+  await fs.writeFile(pathTalkers, JSON.stringify(newList));
+  res.status(204).json();
 });
 
 app.listen(PORT, () => {
