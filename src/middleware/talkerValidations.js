@@ -64,7 +64,7 @@ const validateWatchedAt = (req, res, next) => {
   next();
 };
 
-// para o regex do 'validateWatchedAt' foi consultado o site RegEx Testing ()
+// para o regex do 'validateWatchedAt' foi consultado o site RegEx Testing (https://www.regextester.com/99555)
 
 const validateRate = (req, res, next) => {
   const { rate } = req.body.talk;
