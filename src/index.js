@@ -61,7 +61,7 @@ validateWatchedAt, validateRate, async (req, res) => {
   const otherTalkers = talkerList.filter((element) => element.id !== id);
   const newList = [...otherTalkers, currentTalker];
   await fs.writeFile(pathTalkers, JSON.stringify(newList));
-  res.status(200).json([currentTalker]);
+  res.status(200).json(currentTalker);
 });
 
 app.post('/login', validateEmail, validatePassword, async (req, res) => {
