@@ -9,7 +9,6 @@ const { validateEmail, validatePassword } = require('./middleware/loginValidatio
 const authentication = require('./middleware/authentication.js');
 const { validateName, validateAge, validateTalk, validateWatchedAt,
   validateRate } = require('./middleware/talkerValidations.js');
-// const errorHandler = require('./middleware/errorHandler.js');
 
 const app = express();
 app.use(bodyParser.json());
@@ -20,7 +19,6 @@ const HTTP_OK_STATUS = 200;
 const PORT = '3000';
 
 const pathTalkers = path.resolve(__dirname, '..', 'src', 'talker.json');
-const pathLogin = path.resolve(__dirname, '..', 'src', 'login.json');
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -48,17 +46,15 @@ app.post('/talker', authentication, validateName, validateAge, validateTalk,
 validateWatchedAt, validateRate, async (req, res) => {
   const newTalker = { ...req.body };
   const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
-  const newTalkerList = [...talkerList, newTalker];
+  const currentTalker = { ...newTalker, id: talkerList.length + 1 };
+  const newTalkerList = [...talkerList, currentTalker];
   await fs.writeFile(pathTalkers, JSON.stringify(newTalkerList));
-  res.status(201).json(newTalker);
+  console.log(newTalker);
+  res.status(201).json(currentTalker);
 });
 
 app.post('/login', validateEmail, validatePassword, async (req, res) => {
-  const loginReq = { ...req.body };
-  const loginList = JSON.parse(await fs.readFile(pathLogin, 'utf8'));
   const token = newToken();
-  const newLoginList = [...loginList, loginReq];
-  await fs.writeFile(pathLogin, JSON.stringify(newLoginList));
   res.status(200).json({ token });
 });
 
