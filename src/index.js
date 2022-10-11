@@ -30,6 +30,22 @@ app.post('/login', validateEmail, validatePassword, async (req, res) => {
   res.status(200).json({ token });
 });
 
+app.get('/talker/search', authentication, async (req, res) => {
+  const { q } = req.query;
+  const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
+
+  if (!q || !q.length) {
+    return res.status(200).json(talkerList);
+  }
+  const searchTerm = q.toLowerCase();
+  const searchList = talkerList.filter((talkers) => talkers.name
+    .toLowerCase().includes(searchTerm));
+  if (searchList.length === 0) {
+    return res.status(200).json([]);
+  }
+  return res.status(200).json(searchList);
+});
+
 app.get('/talker', async (req, res) => {
   const talkerList = JSON.parse(await fs.readFile(pathTalkers, 'utf8'));
   res.status(200).json(talkerList);
